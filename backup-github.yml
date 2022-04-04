@@ -1,0 +1,35 @@
+name: Github Postgresql Backup 
+on: [push]
+
+jobs: 
+  Run-Backup-Script:
+    runs-on: ubuntu-latest
+    steps:      
+
+      - name: Install SSH key 
+        uses: webfactory/ssh-agent@v0.4.1 
+        with: 
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }} 
+
+      - name: Add key to known_hosts
+        run: |
+          ssh-keyscan 173.255.252.230 >> ~/.ssh/known_hosts
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Install ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible==2.10.5 requests
+
+      - uses: actions/checkout@v2       
+
+      - name: Add Vault key to environment
+        run: echo ${{ secrets.ANSIBLE_VAULT_PASSWORD }} >> ~/.vault_key.txt
+
+      - name: Backup database staging_blocks        
+        run: ansible-playbook .ansible/playbooks/bbackup.yml -i .ansible/inventories/review/inventory --vault-password-file ~/.vault_key.txt
+
