@@ -7,12 +7,20 @@ jobs:
     steps:  
       - uses: actions/checkout@v2   
 
-      - name: Install SSH key 
-        uses: webfactory/ssh-agent@v0.4.1 
-        with: 
-          ssh-private-key: ${{ secrets.DEPLOY_KEY }} 
+     - name: Setup SSH Keys and known_hosts
+        env:
+            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+            ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+            ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
 
-      
+      - name: Add key to known_hosts
+        run: |
+          ssh-keyscan 173.255.252.230 >> ~/.ssh/known_hosts
+
+      - name: Add Vault key to environment
+        run: echo ${{ secrets.ANSIBLE_VAULT_PASSWORD }} >> ~/.vault_key.txt
+
 
       - name: executing remote ssh commands 
         uses: appleboy/ssh-action@master
@@ -21,3 +29,8 @@ jobs:
           port: 22
           key: ${{ secrets.DEPLOY_KEY }}
           script: whoami
+      
+      - name: Backup database staging_blocks
+        timeout-minutes: 20
+        run: ansible-playbook .ansible/playbooks/bbackup.yml -i .ansible/inventories/review/inventory --vault-password-file ~/.vault_key.txt
+
