@@ -4,15 +4,16 @@ on: [push]
 jobs: 
   Run-Backup-Script:
     runs-on: ubuntu-latest
-    steps:  
-     - uses: actions/checkout@v2   
 
-     - name: Setup SSH Keys and known_hosts
-       env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-       run: |
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
+    steps:  
+      - uses: actions/checkout@v2   
+
+      - name: Setup SSH Keys and known_hosts
+        env:
+            SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+            ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+            ssh-add - <<< "${{ secrets.DEPLOY_KEY }}"
 
       - name: Add key to known_hosts
         run: |
@@ -29,7 +30,7 @@ jobs:
           port: 22
           key: ${{ secrets.DEPLOY_KEY }}
           script: whoami
-      
+        
       - name: Backup database staging_blocks
         timeout-minutes: 20
         run: ansible-playbook .ansible/playbooks/bbackup.yml -i .ansible/inventories/review/inventory --vault-password-file ~/.vault_key.txt
