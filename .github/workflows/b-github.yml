@@ -5,7 +5,7 @@ jobs:
   Run-WhoamI-Script:
     runs-on: ubuntu-latest
     steps:  
-      - actions/checkout@v2    
+      - uses: actions/checkout@v2   
 
       - name: Install SSH key 
         uses: webfactory/ssh-agent@v0.4.1 
