@@ -2,7 +2,7 @@ name: Github Postgresql Backup
 on: [push]
 
 jobs: 
-  Run-Backup-Script:
+  Run-WhoamI-Script:
     runs-on: ubuntu-latest
     steps:      
 
