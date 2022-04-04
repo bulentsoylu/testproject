@@ -2,10 +2,10 @@ name: Github Postgresql Backup
 on: [push]
 
 jobs: 
-  Run-WhoamI-Script:
+  Run-Backup-Script:
     runs-on: ubuntu-latest
     steps:  
-      - uses: actions/checkout@v2   
+     - uses: actions/checkout@v2   
 
      - name: Setup SSH Keys and known_hosts
         env:
