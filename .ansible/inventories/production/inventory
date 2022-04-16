@@ -1,0 +1,4 @@
+[db]
+blocks_db_primary ansible_host=45.79.195.188
+deployer@shell.blocks.li
+#staging_db ansible_host=173.255.252.230  app_host_name=politech
