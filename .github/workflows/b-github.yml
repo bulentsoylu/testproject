@@ -1,5 +1,5 @@
 name: Github Postgresql Backup 
-on: [push]
+on: 
 
 jobs: 
   Run-Backup-Script:
