@@ -1,0 +1,30 @@
+---
+- hosts: "{{ groups['db'][1] }}"
+  remote_user: deployer
+
+  
+
+  tasks:
+    - name: file status
+      find:
+        paths: "/home/deployer/backup/"
+        patterns: "*.dump.gz"
+      register: files_to_list
+
+    - name: Ansible list file 
+      file:
+        path: "{{ item.path }}"
+        state: file
+      with_items: "{{ files_to_list.files }}"
+
+    - name: Copy backup file from db server to staging server using Method Push
+      tags: sync-push
+      synchronize:
+        src: "{{ item }}"
+        dest: "{{ item }}"
+        mode: push
+      delegate_to: "{{ groups['db'][0] }}"
+      register: syncfile
+      with_items:
+      - "/home/deployer/backup/*.dump.gz"
+      
