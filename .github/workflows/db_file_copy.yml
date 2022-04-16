@@ -1,0 +1,30 @@
+name: "Copy Backup files to Stages server"
+on: [push]
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install SSH key
+        uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
+      - name: Add key to known_hosts
+        run: |
+          ssh-keyscan -H 173.255.252.230 >> ~/.ssh/known_hosts
+      - name: Install Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+
+      - name: Install ansible
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible==2.10.5 requests
+      - uses: actions/checkout@v1      
+
+      - name: Run backup script
+        run: ansible-playbook .ansible/playbooks/db_file_copy.yml -i .ansible/inventories/production/inventory  
